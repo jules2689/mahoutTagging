@@ -75,5 +75,4 @@ public class Ticket {
 	    
 		this.processedDescription = stemmedText;
 	}
-
 }

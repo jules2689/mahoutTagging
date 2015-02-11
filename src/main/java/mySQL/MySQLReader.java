@@ -38,32 +38,11 @@ public class MySQLReader {
 		}
 	}
 
-	public Ticket[] getTickets() throws SQLException{
+	public Ticket[] getTaggedTickets() throws SQLException{
 		System.out.println("Fetching all Ticket data.");
 		QueryRunner run = new QueryRunner();
 		Ticket[] result = run.query(this.connection, SqlQueries.ALL_TAGGED_TICKET_SQL, getTicketResultHandler());
 		return result;
-	}
-
-	private ResultSetHandler<Ticket[]> getTicketResultHandler() {
-		ResultSetHandler<Ticket[]> h = new ResultSetHandler<Ticket[]>() {
-			public Ticket[] handle(ResultSet rs) throws SQLException {
-				ArrayList<Ticket> tickets = new ArrayList<Ticket>();
-				while (rs.next()) {
-					Ticket ticket = new Ticket( rs.getInt("id"),
-							rs.getInt("ticket_id"),
-							rs.getString("permanent_domain"),
-							rs.getString("subject"),
-							rs.getString("description"),
-							rs.getDate("z_created_at"),
-							null );
-					getTags(ticket);
-					tickets.add(ticket);
-				}
-				return tickets.toArray(new Ticket[tickets.size()]);
-			}
-		};
-		return h;
 	}
 
 	public String[] getAllTags() {
@@ -77,7 +56,7 @@ public class MySQLReader {
 		return result;
 	}
 
-	public void getTags(Ticket ticket) {
+	public void getTagsForTicket(Ticket ticket) {
 		String sql = String.format(SqlQueries.ALL_TAGS_FOR_TICKET, ticket.rowId);
 		QueryRunner run = new QueryRunner();
 		String[] result = null;
@@ -89,7 +68,7 @@ public class MySQLReader {
 	}
 
 	private ResultSetHandler<String[]> getTagResultHandler() {
-		ResultSetHandler<String[]> h = new ResultSetHandler<String[]>() {
+		ResultSetHandler<String[]> handler = new ResultSetHandler<String[]>() {
 			public String[] handle(ResultSet rs) throws SQLException {
 				ArrayList<String> tags = new ArrayList<String>();
 				while (rs.next()) {
@@ -98,6 +77,27 @@ public class MySQLReader {
 				return tags.toArray(new String[tags.size()]);
 			}
 		};
-		return h;
+		return handler;
+	}
+	
+	private ResultSetHandler<Ticket[]> getTicketResultHandler() {
+		ResultSetHandler<Ticket[]> handler = new ResultSetHandler<Ticket[]>() {
+			public Ticket[] handle(ResultSet rs) throws SQLException {
+				ArrayList<Ticket> tickets = new ArrayList<Ticket>();
+				while (rs.next()) {
+					Ticket ticket = new Ticket( rs.getInt("id"),
+							rs.getInt("ticket_id"),
+							rs.getString("permanent_domain"),
+							rs.getString("subject"),
+							rs.getString("description"),
+							rs.getDate("z_created_at"),
+							null );
+					getTagsForTicket(ticket);
+					tickets.add(ticket);
+				}
+				return tickets.toArray(new Ticket[tickets.size()]);
+			}
+		};
+		return handler;
 	}
 }

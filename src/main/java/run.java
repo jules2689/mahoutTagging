@@ -18,7 +18,7 @@ public class run {
 		Ticket[] tickets = null;
 		String[] allTags = null;
 		try {
-			tickets = reader.getTickets();
+			tickets = reader.getTaggedTickets();
 			allTags = reader.getAllTags();
 		} catch (SQLException e) {
 			e.printStackTrace();

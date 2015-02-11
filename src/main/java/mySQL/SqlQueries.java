@@ -12,5 +12,4 @@ public class SqlQueries {
 			+ "INNER JOIN `taggings` ON `tags`.`id` = `taggings`.`tag_id` "
 			+ "WHERE `taggings`.`taggable_id` = %d AND "
 			+ "`taggings`.`taggable_type` = 'Ticket' AND `taggings`.`context` = 'tags' ORDER BY taggings.id";
-
 }
